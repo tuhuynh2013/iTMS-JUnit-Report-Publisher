@@ -1,0 +1,7 @@
+io\jenkins\plugins\ITMSGlobalConfiguration.class
+io\jenkins\plugins\ITMSInstance.class
+META-INF\annotations\hudson.Extension.txt
+io\jenkins\plugins\ITMSPostBuildConfiguration.class
+io\jenkins\plugins\ITMSPostBuildConfiguration.stapler
+io\jenkins\plugins\ITMSConsts.class
+META-INF\annotations\hudson.Extension

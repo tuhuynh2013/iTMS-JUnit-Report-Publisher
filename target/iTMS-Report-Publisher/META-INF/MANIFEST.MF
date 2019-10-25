@@ -1,0 +1,19 @@
+Manifest-Version: 1.0
+Built-By: DELL
+Created-By: Apache Maven
+Build-Jdk: 13
+Extension-Name: iTMS-Report-Publisher
+Specification-Title: The Jenkins Plugins Parent POM Project
+Implementation-Title: iTMS-Report-Publisher
+Implementation-Version: 1.0-SNAPSHOT
+Group-Id: io.jenkins.plugins
+Short-Name: iTMS-Report-Publisher
+Long-Name: iTMS Report Publisher Plugin
+Minimum-Java-Version: 1.8
+Plugin-Version: 1.0-SNAPSHOT (private-10/25/2019 17:35-DELL)
+Hudson-Version: 2.162
+Jenkins-Version: 2.162
+Plugin-Developers: 
+Plugin-ScmUrl: https://github.com/jenkinsci/plugin-pom/iTMS-Report-Pub
+ lisher
+
