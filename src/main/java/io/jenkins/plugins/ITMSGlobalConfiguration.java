@@ -4,11 +4,17 @@ import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
+import hudson.util.FormValidation;
+import io.jenkins.rest.RequestAPI;
 import net.sf.json.JSONObject;
+import org.apache.commons.lang3.StringUtils;
+import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
+import org.kohsuke.stapler.verb.POST;
 
 import javax.annotation.Nonnull;
-
+import java.io.IOException;
+import java.net.HttpURLConnection;
 
 @Extension
 public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher> {
@@ -17,16 +23,10 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
      * Global configuration information variables. If you don't want fields
      * to be persisted, use <tt>transient</tt>.
      */
+    private String itmsServer;
     private String username;
+    private String companyId;
     private String token;
-
-    public String getUsername() {
-        return username;
-    }
-
-    public String getToken() {
-        return token;
-    }
 
     /**
      * In order to load the persisted global configuration, you have to call
@@ -42,7 +42,9 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
             throws FormException {
         // To persist global configuration information, set that to
         // properties and call save().
+        itmsServer = formData.getString("itmsServer");
         username = formData.getString("username");
+        companyId = formData.getString("companyId");
         token = formData.getString("token");
         save();
         return super.configure(req, formData);
@@ -57,6 +59,59 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
     @Override
     public String getDisplayName() {
         return ITMSConsts.POST_BUILD_NAME;
+    }
+
+    @POST
+    public FormValidation doTestConnection(@QueryParameter String itmsServer, @QueryParameter String username,
+                                           @QueryParameter String companyId, @QueryParameter String token) throws IOException {
+
+        if (StringUtils.isBlank(itmsServer)) {
+            return FormValidation.error("Please enter the iTMS server address");
+        }
+
+        if (StringUtils.isBlank(username)) {
+            return FormValidation.error("Please enter the username");
+        }
+
+        if (StringUtils.isBlank(companyId)) {
+            return FormValidation.error("Please enter the company id12");
+        }
+
+        if (StringUtils.isBlank(token)) {
+            return FormValidation.error("Please enter the token");
+        }
+
+        JSONObject postData = new JSONObject();
+        postData.put("username", username);
+        postData.put("company_id", companyId);
+        postData.put("service_name", "jenkins");
+        postData.put("token", token);
+
+        RequestAPI request = new RequestAPI(itmsServer);
+        int responseCode = request.createPOSTRequest(postData);
+        if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
+            return FormValidation.error("Unauthorized");
+        }
+        if (responseCode != HttpURLConnection.HTTP_OK) {
+            return FormValidation.error(responseCode +": Fail to connect to iTMS server");
+        }
+        return FormValidation.ok("Connection to iTMS has been validated");
+    }
+
+    public String getItmsServer() {
+        return itmsServer;
+    }
+
+    public String getUsername() {
+        return username;
+    }
+
+    public String getCompanyId() {
+        return companyId;
+    }
+
+    public String getToken() {
+        return token;
     }
 
 }
