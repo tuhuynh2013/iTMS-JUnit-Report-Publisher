@@ -28,7 +28,7 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
     private String username;
     private String companyName;
     private String token;
-
+    private AuthenticationInfo authenticationInfo = new AuthenticationInfo();
     /**
      * In order to load the persisted global configuration, you have to call
      * load() in the constructor.
@@ -47,6 +47,10 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
         username = formData.getString("username");
         companyName = formData.getString("companyName");
         token = formData.getString("token");
+
+        authenticationInfo.setUsername(username);
+        authenticationInfo.setCompanyName(companyName);
+        authenticationInfo.setToken(token);
         save();
         return super.configure(req, formData);
     }
@@ -113,6 +117,10 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
 
     public String getToken() {
         return token;
+    }
+
+    public AuthenticationInfo getAuthenticationInfo() {
+        return authenticationInfo;
     }
 
 }

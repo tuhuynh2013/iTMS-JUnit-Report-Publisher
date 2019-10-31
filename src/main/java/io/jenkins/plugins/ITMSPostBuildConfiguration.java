@@ -33,7 +33,7 @@ public class ITMSPostBuildConfiguration extends Notifier {
     @Override
     public boolean perform(final AbstractBuild build, final Launcher launcher, final BuildListener listener) {
         try {
-            listener.getLogger().println("Starting Post Build Action1");
+            listener.getLogger().println("Starting Post Build Action");
 
             File folder = new File(build.getWorkspace() + reportFolder);
             listener.getLogger().println("Report folder" + folder.getPath());
@@ -73,7 +73,11 @@ public class ITMSPostBuildConfiguration extends Notifier {
     }
 
     private HttpResponse sendXMLContent (String content) throws IOException {
+        AuthenticationInfo authenticationInfo = getDescriptor().getAuthenticationInfo();
         JSONObject data = new JSONObject();
+        data.put("username", authenticationInfo.getUsername());
+        data.put("company_name", authenticationInfo.getCompanyName());
+        data.put("token", authenticationInfo.getToken());
         data.put("content", content);
         RequestAPI requestAPI = new RequestAPI("https://webhook.site/cb50f24f-8d4a-463b-ba99-39a8b8485817");
         return requestAPI.createPOSTRequest(data);
