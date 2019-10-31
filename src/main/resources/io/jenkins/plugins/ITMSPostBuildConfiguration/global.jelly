@@ -13,7 +13,7 @@
             <f:textbox/>
         </f:entry>
 
-        <f:entry title="Company" field="companyId">
+        <f:entry title="Company name" field="companyName">
             <f:textbox/>
         </f:entry>
 
@@ -24,7 +24,7 @@
         <f:entry>
             <f:validateButton title="Test Configuration&#160;"
                               progress="Please wait .. We are validating the connection and credentials"
-                              method="testConnection" with="itmsServer,username,companyId,token"/>
+                              method="testConnection" with="itmsServer,username,companyName,token"/>
         </f:entry>
     </f:section>
 </j:jelly>

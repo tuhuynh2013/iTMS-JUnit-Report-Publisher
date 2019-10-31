@@ -22,22 +22,19 @@ public class RequestAPI {
         httpClient = HttpClientBuilder.create().build();
     }
 
-    public int createPOSTRequest(JSONObject postData) throws IOException {
-        int responseCode = 0;
+    public HttpResponse createPOSTRequest(JSONObject postData) throws IOException {
+        HttpResponse response = null;
         try {
             StringEntity params = new StringEntity(postData.toString());
             HttpPost request = new HttpPost(baseUrl);
             request.addHeader("content-type", "application/json");
             request.setEntity(params);
 
-            HttpResponse response = httpClient.execute(request);
-            responseCode = response.getStatusLine().getStatusCode();
-        } catch (IOException e) {
-
+            response = httpClient.execute(request);
         } finally {
             httpClient.close();
         }
-        return responseCode;
+        return response;
     }
 
 }

@@ -11,6 +11,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.verb.POST;
+import hidden.jth.org.apache.http.HttpResponse;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
@@ -25,7 +26,7 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
      */
     private String itmsServer;
     private String username;
-    private String companyId;
+    private String companyName;
     private String token;
 
     /**
@@ -44,7 +45,7 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
         // properties and call save().
         itmsServer = formData.getString("itmsServer");
         username = formData.getString("username");
-        companyId = formData.getString("companyId");
+        companyName = formData.getString("companyName");
         token = formData.getString("token");
         save();
         return super.configure(req, formData);
@@ -63,7 +64,7 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
 
     @POST
     public FormValidation doTestConnection(@QueryParameter String itmsServer, @QueryParameter String username,
-                                           @QueryParameter String companyId, @QueryParameter String token) throws IOException {
+                                           @QueryParameter String companyName, @QueryParameter String token) throws IOException {
 
         if (StringUtils.isBlank(itmsServer)) {
             return FormValidation.error("Please enter the iTMS server address");
@@ -73,8 +74,8 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
             return FormValidation.error("Please enter the username");
         }
 
-        if (StringUtils.isBlank(companyId)) {
-            return FormValidation.error("Please enter the company id12");
+        if (StringUtils.isBlank(companyName)) {
+            return FormValidation.error("Please enter the company name");
         }
 
         if (StringUtils.isBlank(token)) {
@@ -83,18 +84,18 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
 
         JSONObject postData = new JSONObject();
         postData.put("username", username);
-        postData.put("company_id", companyId);
+        postData.put("company_name", companyName);
         postData.put("service_name", "jenkins");
         postData.put("token", token);
 
         RequestAPI request = new RequestAPI(itmsServer);
-        int responseCode = request.createPOSTRequest(postData);
-        if (responseCode == HttpURLConnection.HTTP_UNAUTHORIZED) {
-            return FormValidation.error("Unauthorized");
+        HttpResponse response = request.createPOSTRequest(postData);
+
+        if (response.getStatusLine().getStatusCode() != HttpURLConnection.HTTP_OK) {
+            return FormValidation.error(response.getStatusLine().getStatusCode() + ": " +
+                    response.getStatusLine().getReasonPhrase());
         }
-        if (responseCode != HttpURLConnection.HTTP_OK) {
-            return FormValidation.error(responseCode +": Fail to connect to iTMS server");
-        }
+
         return FormValidation.ok("Connection to iTMS has been validated");
     }
 
@@ -106,8 +107,8 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
         return username;
     }
 
-    public String getCompanyId() {
-        return companyId;
+    public String getCompanyName() {
+        return companyName;
     }
 
     public String getToken() {
