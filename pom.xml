@@ -10,10 +10,10 @@
     </parent>
 
     <groupId>io.jenkins.plugins</groupId>
-    <artifactId>iTMS-Report-Publisher</artifactId>
+    <artifactId>iTMS-JUnit-Report-Publisher</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>hpi</packaging>
-    <name>iTMS Report Publisher Plugin</name>
+    <name>iTMS JUnit Report Publisher Plugin</name>
 
     <properties>
         <jenkins.version>2.164.1</jenkins.version>

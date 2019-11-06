@@ -21,6 +21,12 @@ public class ITMSPostBuildConfiguration extends Notifier {
 
     private final String reportFolder;
 
+    // Messages
+    private final String EMPTY_FOLDER = "Folder is empty!";
+    private final String EMPTY_CONTENT = "Report file(s) is empty!";
+    private final String XML_NOT_FOUND = "XML not found!";
+
+
     @DataBoundConstructor
     public ITMSPostBuildConfiguration(final String reportFolder) {
         this.reportFolder = reportFolder;
@@ -40,7 +46,7 @@ public class ITMSPostBuildConfiguration extends Notifier {
             File[] listOfFiles = folder.listFiles();
             if (listOfFiles != null) {
                 for (File file: listOfFiles) {
-                    if (file.getName().endsWith(".xml") || file.getName().endsWith(".XML")) {
+                    if (file.getName().toLowerCase().endsWith(".xml")) {
                         StringBuilder content = new StringBuilder();
                         Files.lines(Paths.get(file.toString()),
                                 StandardCharsets.UTF_8).forEach(content::append);
@@ -48,12 +54,14 @@ public class ITMSPostBuildConfiguration extends Notifier {
                             HttpResponse response = sendXMLContent(content.toString());
                             listener.getLogger().println("Response: " + response.getStatusLine().getReasonPhrase());
                         } else {
-                            listener.getLogger().println("Report file(s) is empty!");
+                            listener.getLogger().println(EMPTY_CONTENT);
                         }
+                    } else {
+                        listener.getLogger().println(XML_NOT_FOUND);
                     }
                 }
             } else {
-                listener.getLogger().println("File not found!");
+                listener.getLogger().println(EMPTY_FOLDER);
             }
 
         } catch (Exception e) {
