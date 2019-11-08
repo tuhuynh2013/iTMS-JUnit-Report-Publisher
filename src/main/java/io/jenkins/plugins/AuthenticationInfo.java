@@ -2,7 +2,6 @@ package io.jenkins.plugins;
 
 public class AuthenticationInfo {
     private String username;
-    private String companyName;
     private String token;
 
     public String getUsername() {
@@ -11,14 +10,6 @@ public class AuthenticationInfo {
 
     public void setUsername(String username) {
         this.username = username;
-    }
-
-    public String getCompanyName() {
-        return companyName;
-    }
-
-    public void setCompanyName(String companyName) {
-        this.companyName = companyName;
     }
 
     public String getToken() {

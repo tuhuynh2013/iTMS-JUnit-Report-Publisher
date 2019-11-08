@@ -4,16 +4,12 @@
     <!--
       This Jelly script is used to produce the global configuration option.
     -->
-    <f:section title="iTMS Server Configuration">
+    <f:section title="iTMS JUnit Server Configuration">
         <f:entry title="iTMS server" field="itmsServer">
             <f:textbox/>
         </f:entry>
 
         <f:entry title="Username" field="username">
-            <f:textbox/>
-        </f:entry>
-
-        <f:entry title="Company name" field="companyName">
             <f:textbox/>
         </f:entry>
 
@@ -24,7 +20,7 @@
         <f:entry>
             <f:validateButton title="Test Configuration&#160;"
                               progress="Please wait .. We are validating the connection and credentials"
-                              method="testConnection" with="itmsServer,username,companyName,token"/>
+                              method="testConnection" with="itmsServer,username,token"/>
         </f:entry>
     </f:section>
 </j:jelly>

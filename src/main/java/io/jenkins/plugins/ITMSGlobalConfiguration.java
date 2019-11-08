@@ -26,7 +26,6 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
      */
     private String itmsServer;
     private String username;
-    private String companyName;
     private String token;
     private AuthenticationInfo authenticationInfo = new AuthenticationInfo();
     /**
@@ -45,11 +44,9 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
         // properties and call save().
         itmsServer = formData.getString("itmsServer");
         username = formData.getString("username");
-        companyName = formData.getString("companyName");
         token = formData.getString("token");
 
         authenticationInfo.setUsername(username);
-        authenticationInfo.setCompanyName(companyName);
         authenticationInfo.setToken(token);
         save();
         return super.configure(req, formData);
@@ -68,7 +65,7 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
 
     @POST
     public FormValidation doTestConnection(@QueryParameter String itmsServer, @QueryParameter String username,
-                                           @QueryParameter String companyName, @QueryParameter String token) throws IOException {
+                                           @QueryParameter String token) throws IOException {
 
         if (StringUtils.isBlank(itmsServer)) {
             return FormValidation.error("Please enter the iTMS server address");
@@ -78,17 +75,12 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
             return FormValidation.error("Please enter the username");
         }
 
-        if (StringUtils.isBlank(companyName)) {
-            return FormValidation.error("Please enter the company name");
-        }
-
         if (StringUtils.isBlank(token)) {
             return FormValidation.error("Please enter the token");
         }
 
         JSONObject postData = new JSONObject();
         postData.put("username", username);
-        postData.put("company_name", companyName);
         postData.put("service_name", "jenkins");
         postData.put("token", token);
 
@@ -109,10 +101,6 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
 
     public String getUsername() {
         return username;
-    }
-
-    public String getCompanyName() {
-        return companyName;
     }
 
     public String getToken() {
