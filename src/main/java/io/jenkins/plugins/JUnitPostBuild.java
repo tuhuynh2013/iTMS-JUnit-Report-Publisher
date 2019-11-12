@@ -22,7 +22,7 @@ import java.util.Objects;
 import static io.jenkins.plugins.ITMSConsts.SERVICE_NAME;
 
 
-public class ITMSPostBuildConfiguration extends Notifier {
+public class JUnitPostBuild extends Notifier {
 
     private final String itmsAddress;
     private final String reportFolder;
@@ -30,8 +30,8 @@ public class ITMSPostBuildConfiguration extends Notifier {
     private final String cycleName;
 
     @DataBoundConstructor
-    public ITMSPostBuildConfiguration(final String itmsAddress, final String reportFolder,
-                                      final String ticketTitle, final String cycleName) {
+    public JUnitPostBuild(final String itmsAddress, final String reportFolder,
+                          final String ticketTitle, final String cycleName) {
         this.itmsAddress = itmsAddress;
         this.reportFolder = reportFolder;
         this.ticketTitle = ticketTitle;
@@ -45,7 +45,7 @@ public class ITMSPostBuildConfiguration extends Notifier {
             listener.getLogger().println("Starting Post Build Action");
 
             File folder = new File(build.getWorkspace() + reportFolder);
-            listener.getLogger().println("Report folder" + folder.getPath());
+            listener.getLogger().println("Report folder: " + folder.getPath());
             File[] listOfFiles = folder.listFiles();
             if (listOfFiles != null) {
                 for (File file : listOfFiles) {
@@ -77,8 +77,8 @@ public class ITMSPostBuildConfiguration extends Notifier {
     }
 
     @Override
-    public ITMSGlobalConfiguration getDescriptor() {
-        return (ITMSGlobalConfiguration) super.getDescriptor();
+    public JUnitGlobalConfiguration getDescriptor() {
+        return (JUnitGlobalConfiguration) super.getDescriptor();
     }
 
     private HttpResponse sendXMLContent(String content, AbstractBuild build) throws IOException {

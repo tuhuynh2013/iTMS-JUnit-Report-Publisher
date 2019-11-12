@@ -18,7 +18,7 @@ import java.io.IOException;
 import java.net.HttpURLConnection;
 
 @Extension
-public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher> {
+public final class JUnitGlobalConfiguration extends BuildStepDescriptor<Publisher> {
 
     /**
      * Global configuration information variables. If you don't want fields
@@ -32,8 +32,8 @@ public final class ITMSGlobalConfiguration extends BuildStepDescriptor<Publisher
      * In order to load the persisted global configuration, you have to call
      * load() in the constructor.
      */
-    public ITMSGlobalConfiguration() {
-        super(ITMSPostBuildConfiguration.class);
+    public JUnitGlobalConfiguration() {
+        super(JUnitPostBuild.class);
         load();
     }
 
