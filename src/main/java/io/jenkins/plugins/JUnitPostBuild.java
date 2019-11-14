@@ -7,11 +7,12 @@ import hudson.model.Cause;
 import hudson.tasks.BuildStepMonitor;
 import hudson.tasks.Notifier;
 
-import io.jenkins.rest.RequestAPI;
+import io.jenkins.plugins.model.AuthenticationInfo;
+import io.jenkins.plugins.rest.RequestAPI;
+import io.jenkins.plugins.rest.StandardResponse;
 import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
-import hidden.jth.org.apache.http.HttpResponse;
 
 import java.io.*;
 import java.nio.charset.StandardCharsets;
@@ -19,23 +20,25 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Objects;
 
-import static io.jenkins.plugins.ITMSConsts.SERVICE_NAME;
+import static io.jenkins.plugins.model.ITMSConsts.SERVICE_NAME;
 
 
 public class JUnitPostBuild extends Notifier {
 
     private final String itmsAddress;
     private final String reportFolder;
-    private final String ticketTitle;
+    private final String projectId;
+    private final String ticketKey;
     private final String cycleName;
 
     @DataBoundConstructor
     public JUnitPostBuild(final String itmsAddress, final String reportFolder,
-                          final String ticketTitle, final String cycleName) {
-        this.itmsAddress = itmsAddress;
-        this.reportFolder = reportFolder;
-        this.ticketTitle = ticketTitle;
-        this.cycleName = cycleName;
+                          final String projectId, final String ticketKey, final String cycleName) {
+        this.itmsAddress = itmsAddress.trim();
+        this.reportFolder = reportFolder.trim();
+        this.projectId = projectId.trim();
+        this.ticketKey = ticketKey.trim();
+        this.cycleName = cycleName.trim();
     }
 
     @Override
@@ -49,7 +52,7 @@ public class JUnitPostBuild extends Notifier {
             File[] listOfFiles = folder.listFiles();
             if (listOfFiles != null) {
                 for (File file : listOfFiles) {
-                    String content = "";
+                    String content;
                     if (file.getName().toLowerCase().endsWith(".xml")) {
                         counter++;
                         content = readFileContent(file);
@@ -81,7 +84,7 @@ public class JUnitPostBuild extends Notifier {
         return (JUnitGlobalConfiguration) super.getDescriptor();
     }
 
-    private HttpResponse sendXMLContent(String content, AbstractBuild build) throws IOException {
+    private StandardResponse sendXMLContent(String content, AbstractBuild build) {
         AuthenticationInfo authenticationInfo = getDescriptor().getAuthenticationInfo();
 
         Cause cause = (Cause) build.getCauses().get(0);
@@ -99,11 +102,12 @@ public class JUnitPostBuild extends Notifier {
         data.put("username", authenticationInfo.getUsername());
         data.put("service_name", SERVICE_NAME);
         data.put("token", authenticationInfo.getToken());
-        data.put("project_name", build.getProject().getName());
+        data.put("project_id", projectId);
         data.put("jenkins_auto_executions_attributes", jenkinsAttributes);
-        data.put("ticket_title", ticketTitle);
+        data.put("ticket_key", ticketKey);
         data.put("cycle_name", cycleName);
-        data.put("json_result", content);
+        data.put("is_json", Boolean.FALSE);
+        data.put("report_content", content);
         RequestAPI requestAPI = new RequestAPI(itmsAddress);
         return requestAPI.createPOSTRequest(data);
     }
@@ -115,15 +119,12 @@ public class JUnitPostBuild extends Notifier {
         return content.toString();
     }
 
-    private String sendReportContent (String content, AbstractBuild build) throws IOException {
-        String responseStr = "";
+    private String sendReportContent(String content, AbstractBuild build) {
         if (content.length() > 0) {
-            HttpResponse response = sendXMLContent(content, build);
-            responseStr = "JUnit plugin response: " + response.getStatusLine().getReasonPhrase();
-        } else {
-            responseStr = "Report file(s) is empty!";
+            StandardResponse response = sendXMLContent(content, build);
+            return "JUnit plugin response: " + response.toString();
         }
-        return responseStr;
+        return "Report file(s) is empty!";
     }
 
     public String getItmsAddress() {
@@ -134,12 +135,16 @@ public class JUnitPostBuild extends Notifier {
         return reportFolder;
     }
 
-    public String getTicketTitle() {
-        return ticketTitle;
+    public String getTicketKey() {
+        return ticketKey;
     }
 
     public String getCycleName() {
         return cycleName;
+    }
+
+    public String getProjectId() {
+        return projectId;
     }
 
 }

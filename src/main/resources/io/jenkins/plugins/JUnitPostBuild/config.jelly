@@ -12,11 +12,22 @@
         <f:textbox />
     </f:entry>
 
-    <f:entry title="Ticket title" field="ticketTitle">
+    <f:entry title="Project id" field="projectId">
+        <f:textbox />
+    </f:entry>
+
+    <f:entry title="Ticket key" field="ticketKey">
         <f:textbox />
     </f:entry>
 
     <f:entry title="Cycle name" field="cycleName">
-        <f:textbox />
+        <f:select />
     </f:entry>
+
+    <f:entry>
+        <f:validateButton title="Test Configuration&#160;"
+                          progress="Please wait .. We are validating the configuration"
+                          method="testConfiguration" with="itmsAddress,reportFolder,projectId,ticketKey,cycleName"/>
+    </f:entry>
+
 </j:jelly>

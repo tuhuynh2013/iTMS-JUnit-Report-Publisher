@@ -1,21 +1,31 @@
 package io.jenkins.plugins;
 
+import com.google.gson.FieldNamingPolicy;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import hidden.jth.org.apache.http.HttpStatus;
 import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.tasks.BuildStepDescriptor;
 import hudson.tasks.Publisher;
 import hudson.util.FormValidation;
-import io.jenkins.rest.RequestAPI;
+import hudson.util.ListBoxModel;
+import io.jenkins.plugins.model.AuthenticationInfo;
+import io.jenkins.plugins.model.Cycle;
+import io.jenkins.plugins.model.ITMSConsts;
+import io.jenkins.plugins.rest.RequestAPI;
+import io.jenkins.plugins.rest.StandardResponse;
+import io.jenkins.plugins.util.URLValidator;
+import jenkins.org.apache.commons.validator.routines.UrlValidator;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.QueryParameter;
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.verb.POST;
-import hidden.jth.org.apache.http.HttpResponse;
 
 import javax.annotation.Nonnull;
-import java.io.IOException;
-import java.net.HttpURLConnection;
+import java.io.*;
+
 
 @Extension
 public final class JUnitGlobalConfiguration extends BuildStepDescriptor<Publisher> {
@@ -28,6 +38,7 @@ public final class JUnitGlobalConfiguration extends BuildStepDescriptor<Publishe
     private String username;
     private String token;
     private AuthenticationInfo authenticationInfo = new AuthenticationInfo();
+
     /**
      * In order to load the persisted global configuration, you have to call
      * load() in the constructor.
@@ -85,14 +96,68 @@ public final class JUnitGlobalConfiguration extends BuildStepDescriptor<Publishe
         postData.put("token", token);
 
         RequestAPI request = new RequestAPI(itmsServer);
-        HttpResponse response = request.createPOSTRequest(postData);
+        StandardResponse response = request.createPOSTRequest(postData);
 
-        if (response.getStatusLine().getStatusCode() != HttpURLConnection.HTTP_OK) {
-            return FormValidation.error(response.getStatusLine().getStatusCode() + ": " +
-                    response.getStatusLine().getReasonPhrase());
+        if (response.getCode() != HttpStatus.SC_OK) {
+            return FormValidation.error(response.toString());
         }
 
         return FormValidation.ok("Connection to iTMS has been validated");
+    }
+
+    @POST
+    public FormValidation doTestConfiguration(@QueryParameter String itmsAddress, @QueryParameter String reportFolder,
+                                              @QueryParameter String projectId, @QueryParameter String ticketKey, @QueryParameter String cycleName) {
+
+        if (StringUtils.isBlank(itmsAddress)) {
+            return FormValidation.error("Please enter the iTMS server address");
+        }
+
+        if (!URLValidator.isValidUrl(itmsAddress)) {
+            return FormValidation.error("This value is not a valid url!");
+        }
+
+        if (StringUtils.isBlank(reportFolder)) {
+            return FormValidation.error("Please enter the report folder!");
+        }
+
+        if (!reportFolder.startsWith("/")) {
+            return FormValidation.error("Please begin with forward slash! Ex: /target/report ");
+        }
+
+        if (StringUtils.isBlank(projectId)) {
+            return FormValidation.error("Please enter the Project id!");
+        }
+
+        if (StringUtils.isBlank(ticketKey)) {
+            return FormValidation.error("Please enter the ticket key!");
+        }
+
+        if (StringUtils.isBlank(cycleName)) {
+            return FormValidation.error("Please enter the cycle name!");
+        }
+
+        return FormValidation.ok("Configuration is valid!");
+    }
+
+    public ListBoxModel doFillCycleNameItems(@QueryParameter String itmsAddress, @QueryParameter String projectId) {
+        ListBoxModel listBoxModel = new ListBoxModel();
+
+        RequestAPI requestAPI = new RequestAPI(itmsAddress);
+        StandardResponse response = requestAPI.getCycleName(projectId);
+        if (response.getCode() == HttpStatus.SC_OK) {
+            Cycle cycle = readJsonCycle(response);
+            cycle.getTestCycle().forEach(testCycle -> listBoxModel.add(testCycle.getName()));
+        }
+
+        return listBoxModel;
+    }
+
+    private Cycle readJsonCycle(StandardResponse response) {
+        Gson gson = new GsonBuilder()
+                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+                .create();
+        return gson.fromJson(response.getMessage(), Cycle.class);
     }
 
     public String getItmsServer() {
