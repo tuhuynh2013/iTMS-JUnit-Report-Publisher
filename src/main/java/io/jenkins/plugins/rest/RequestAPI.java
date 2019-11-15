@@ -14,6 +14,9 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.charset.StandardCharsets;
 
+import static io.jenkins.plugins.model.ITMSConsts.GET_CYCLE_URL;
+import static io.jenkins.plugins.model.ITMSConsts.URL_CONJUNCT;
+
 
 public class RequestAPI {
 
@@ -25,7 +28,7 @@ public class RequestAPI {
         httpClient = HttpClientBuilder.create().build();
     }
 
-    public StandardResponse createPOSTRequest(JSONObject postData)  {
+    public StandardResponse createPOSTRequest(JSONObject postData) {
         StandardResponse response = new StandardResponse();
         try {
             StringEntity params = new StringEntity(postData.toString());
@@ -47,11 +50,11 @@ public class RequestAPI {
     }
 
 
-    public StandardResponse getCycleName (String projectId) {
+    public StandardResponse getCycleName(String projectId) {
         StandardResponse response = new StandardResponse();
         try {
             URI uri = new URI(baseUrl);
-            baseUrl = uri.getScheme() + "://" + uri.getAuthority() + "/api/v2/cycle?project_id=" + projectId;
+            baseUrl = uri.getScheme() + URL_CONJUNCT + uri.getAuthority() + GET_CYCLE_URL + projectId;
 
             HttpGet request = new HttpGet(baseUrl);
             HttpResponse httpResponse = httpClient.execute(request);

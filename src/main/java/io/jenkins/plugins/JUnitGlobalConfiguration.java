@@ -16,7 +16,6 @@ import io.jenkins.plugins.model.ITMSConsts;
 import io.jenkins.plugins.rest.RequestAPI;
 import io.jenkins.plugins.rest.StandardResponse;
 import io.jenkins.plugins.util.URLValidator;
-import jenkins.org.apache.commons.validator.routines.UrlValidator;
 import net.sf.json.JSONObject;
 import org.apache.commons.lang3.StringUtils;
 import org.kohsuke.stapler.QueryParameter;
@@ -24,7 +23,6 @@ import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.verb.POST;
 
 import javax.annotation.Nonnull;
-import java.io.*;
 
 
 @Extension
@@ -76,7 +74,7 @@ public final class JUnitGlobalConfiguration extends BuildStepDescriptor<Publishe
 
     @POST
     public FormValidation doTestConnection(@QueryParameter String itmsServer, @QueryParameter String username,
-                                           @QueryParameter String token) throws IOException {
+                                           @QueryParameter String token) {
 
         if (StringUtils.isBlank(itmsServer)) {
             return FormValidation.error("Please enter the iTMS server address");
