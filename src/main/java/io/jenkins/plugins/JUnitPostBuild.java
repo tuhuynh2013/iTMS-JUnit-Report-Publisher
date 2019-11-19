@@ -57,8 +57,9 @@ public class JUnitPostBuild extends Notifier {
                     String content;
                     if (file.getName().toLowerCase().endsWith(".xml")) {
                         counter++;
+                        listener.getLogger().println("Read report file: " + file.getName());
                         content = readFileContent(file);
-                        listener.getLogger().println(sendReportContent(content, build));
+                        listener.getLogger().println(sendReportContent(file.getName(), content, build));
                     }
                 }
 
@@ -120,12 +121,12 @@ public class JUnitPostBuild extends Notifier {
         return content.toString();
     }
 
-    private String sendReportContent(String content, AbstractBuild build) {
+    private String sendReportContent(String fileName, String content, AbstractBuild build) {
         if (content.length() > 0) {
             StandardResponse response = sendXMLContent(content, build);
             return "JUnit plugin response: " + response.toString();
         }
-        return "Report file(s) is empty!";
+        return fileName + " is empty!";
     }
 
     public String getItmsAddress() {
