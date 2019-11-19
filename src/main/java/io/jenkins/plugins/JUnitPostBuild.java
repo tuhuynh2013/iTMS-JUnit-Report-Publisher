@@ -14,7 +14,9 @@ import net.sf.json.JSONArray;
 import net.sf.json.JSONObject;
 import org.kohsuke.stapler.DataBoundConstructor;
 
-import java.io.*;
+
+import java.io.File;
+import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
@@ -27,16 +29,16 @@ public class JUnitPostBuild extends Notifier {
 
     private final String itmsAddress;
     private final String reportFolder;
-    private final String projectId;
+    private final String projectName;
     private final String ticketKey;
     private final String cycleName;
 
     @DataBoundConstructor
     public JUnitPostBuild(final String itmsAddress, final String reportFolder,
-                          final String projectId, final String ticketKey, final String cycleName) {
+                          final String projectName, final String ticketKey, final String cycleName) {
         this.itmsAddress = itmsAddress.trim();
         this.reportFolder = reportFolder.trim();
-        this.projectId = projectId.trim();
+        this.projectName = projectName.trim();
         this.ticketKey = ticketKey.trim();
         this.cycleName = cycleName.trim();
     }
@@ -47,7 +49,7 @@ public class JUnitPostBuild extends Notifier {
         try {
             listener.getLogger().println("Starting Post Build Action");
 
-            File folder = new File(build.getWorkspace() + reportFolder);
+            java.io.File folder = new File(build.getWorkspace() + reportFolder);
             listener.getLogger().println("Report folder: " + folder.getPath());
             File[] listOfFiles = folder.listFiles();
             if (listOfFiles != null) {
@@ -102,7 +104,7 @@ public class JUnitPostBuild extends Notifier {
         data.put("username", authenticationInfo.getUsername());
         data.put("service_name", SERVICE_NAME);
         data.put("token", authenticationInfo.getToken());
-        data.put("project_id", projectId);
+        data.put("project_name", projectName);
         data.put("jenkins_auto_executions_attributes", jenkinsAttributes);
         data.put("ticket_key", ticketKey);
         data.put("cycle_name", cycleName);
@@ -114,8 +116,7 @@ public class JUnitPostBuild extends Notifier {
 
     private String readFileContent(File file) throws IOException {
         StringBuilder content = new StringBuilder();
-        Files.lines(Paths.get(file.toString()),
-                StandardCharsets.UTF_8).forEach(content::append);
+        Files.lines(Paths.get(file.toString()), StandardCharsets.UTF_8).forEach(content::append);
         return content.toString();
     }
 
@@ -143,8 +144,8 @@ public class JUnitPostBuild extends Notifier {
         return cycleName;
     }
 
-    public String getProjectId() {
-        return projectId;
+    public String getProjectName() {
+        return projectName;
     }
 
 }

@@ -105,7 +105,7 @@ public final class JUnitGlobalConfiguration extends BuildStepDescriptor<Publishe
 
     @POST
     public FormValidation doTestConfiguration(@QueryParameter String itmsAddress, @QueryParameter String reportFolder,
-                                              @QueryParameter String projectId, @QueryParameter String ticketKey, @QueryParameter String cycleName) {
+                                              @QueryParameter String projectName, @QueryParameter String ticketKey, @QueryParameter String cycleName) {
 
         if (StringUtils.isBlank(itmsAddress)) {
             return FormValidation.error("Please enter the iTMS server address");
@@ -123,8 +123,8 @@ public final class JUnitGlobalConfiguration extends BuildStepDescriptor<Publishe
             return FormValidation.error("Please begin with forward slash! Ex: /target/report ");
         }
 
-        if (StringUtils.isBlank(projectId)) {
-            return FormValidation.error("Please enter the Project id!");
+        if (StringUtils.isBlank(projectName)) {
+            return FormValidation.error("Please enter the Project name!");
         }
 
         if (StringUtils.isBlank(ticketKey)) {
@@ -138,25 +138,25 @@ public final class JUnitGlobalConfiguration extends BuildStepDescriptor<Publishe
         return FormValidation.ok("Configuration is valid!");
     }
 
-    public ListBoxModel doFillCycleNameItems(@QueryParameter String itmsAddress, @QueryParameter String projectId) {
-        ListBoxModel listBoxModel = new ListBoxModel();
+//    public ListBoxModel doFillCycleNameItems(@QueryParameter String itmsAddress, @QueryParameter String projectId) {
+//        ListBoxModel listBoxModel = new ListBoxModel();
+//
+//        RequestAPI requestAPI = new RequestAPI(itmsAddress);
+//        StandardResponse response = requestAPI.getCycleName(projectId);
+//        if (response.getCode() == HttpStatus.SC_OK) {
+//            Cycle cycle = readJsonCycle(response);
+//            cycle.getTestCycle().forEach(testCycle -> listBoxModel.add(testCycle.getName()));
+//        }
+//
+//        return listBoxModel;
+//    }
 
-        RequestAPI requestAPI = new RequestAPI(itmsAddress);
-        StandardResponse response = requestAPI.getCycleName(projectId);
-        if (response.getCode() == HttpStatus.SC_OK) {
-            Cycle cycle = readJsonCycle(response);
-            cycle.getTestCycle().forEach(testCycle -> listBoxModel.add(testCycle.getName()));
-        }
-
-        return listBoxModel;
-    }
-
-    private Cycle readJsonCycle(StandardResponse response) {
-        Gson gson = new GsonBuilder()
-                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
-                .create();
-        return gson.fromJson(response.getMessage(), Cycle.class);
-    }
+//    private Cycle readJsonCycle(StandardResponse response) {
+////        Gson gson = new GsonBuilder()
+////                .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+////                .create();
+////        return gson.fromJson(response.getMessage(), Cycle.class);
+////    }
 
     public String getItmsServer() {
         return itmsServer;
